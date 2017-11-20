@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Simple Use of The load() Function</title>
+    <link rel="stylesheet" type="text/css" href="questionereStyle.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        var array;
+        var i=0,counter=0;
+        xhr =new XMLHttpRequest();
+
+        function Question(i)
+        {
+            document.getElementById("button3").disabled = false;
+            if(i > 0){
+                check_answer($("input[name='op']:checked").val());
+            }
+
+            if(i>9) {
+                $("#result").replaceWith("<div id='result'> ********** The number of your correct answers is: " + counter + " **********</div>");
+                document.getElementById("button3").disabled = true;
+                document.getElementById("button2").disabled = true;
+            }else{
+                $("#result").replaceWith("<div id='result'> Welcome to My Questionere!</div>");
+                document.getElementById("button3").disabled = false;
+                document.getElementById("button2").disabled = false;
+            }
+
+            xhr.abort();
+            xhr.open(
+                "GET",
+                 "data.json", true);
+            xhr.onreadystatechange= function()
+            {
+                if (xhr.readyState == 4 && xhr.status == 200)
+                {
+                 var ob = xhr.responseText;
+                    array = JSON.parse(ob);
+
+                    $("#question").html("Question is: "+array[i].question);
+                    $("#option").html("Please choose one answer: ");
+                    $("#option1").replaceWith("<div id='option1'>" +
+                    "<input type=radio name='op' value=" + array[i].options[0] + ">" +array[i].options[0] + "<br>" +
+                    "<input type=radio name='op' value=" + array[i].options[1] + ">" +array[i].options[1] +  "<br>" +
+                    "<input type=radio name='op' value=" + array[i].options[2] + ">" +array[i].options[2] +  "<br>" +
+                    "<input type=radio name='op' value=" + array[i].options[3] + ">" +array[i].options[3] + "</div>");
+
+                } };
+            xhr.send(null);
+        } ;
+
+
+        function Prev() {
+           if(i>0) {
+               counter--;
+               i--;
+               if(counter<0){
+                   counter=0;
+               }
+           }
+            if(i < 1){
+                Question(i+1);
+            }
+            else {
+                Question(i);
+            }
+            }
+        function Start() {
+            counter=0;
+            i=0;
+            document.getElementById("button3").disabled = false;
+            document.getElementById("button2").disabled = false;
+            Question(counter);
+        }
+    </script>
+
+
+    <script>
+        function check_answer(answer)
+        {
+            if(answer == array[i-1].answer){
+                counter++;
+            }
+        }
+    </script>
+
+</head>
+<body>
+<div id="result"> Welcome to My Questionere!  </div>
+<div id="main">
+<div id="question"></div>
+<div id="option"></div>
+<div id="option1"></div><br>
+
+    <button onclick="Start()" id="button1" class="button">Start</button>
+    <button onclick="Prev()" id="button2" class="button" >Previous</button>
+    <button onclick="Question(++i)" id="button3" class="button" disabled="false">Next</button>
+
+</div>
+
+</body>
+</html>
